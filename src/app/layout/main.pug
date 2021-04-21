@@ -1,0 +1,35 @@
+doctype html
+html(lang="ru")
+    head
+        link(rel="preload" href="/css/main.css" as="style")
+        link(rel="preload" href="/js/app.js" as="script")
+        link(rel="preload" href="/css/fonts/TTFirsNeue-Regular.eot" as="font")
+        link(rel="preload" href="/css/fonts/TTFirsNeue-Regular.ttf" as="font")
+        link(rel="preload" href="/css/fonts/TTFirsNeue-Regular.woff" as="font")
+        link(rel="preload" href="/css/fonts/TTFirsNeue-Regular.woff2" as="font")
+
+        meta(charset="utf-8")
+        link(rel="shortcut icon" href="/favicon.ico")
+        link(rel="stylesheet" href='css/main.css')
+        title Site
+
+    body
+        div#page
+            header
+                section.header-content
+                    block header
+                        include elements/header
+
+            section.content-container
+                div.content
+                    // HEADER END
+                    // CONTENT START
+                    block content
+                    // CONTENT END
+                    // FOOTER START
+            footer
+                section.footer-content
+                    block footer
+                        include elements/footer
+
+        script(src='js/app.js')

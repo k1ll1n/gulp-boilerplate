@@ -1,0 +1,37 @@
+require-fonts($font-family, $file-name) {
+  @font-face {
+    font-family: $font-family
+    src: url("/css/fonts/" + $file-name + ".woff") format('woff'),
+            url("/css/fonts/" + $file-name + ".ttf") format('truetype')
+
+    font-weight: normal
+    font-style: normal
+  }
+}
+
+responsive-font($min-font-size = 12px, $max-font-size = 21px, $lower-range = 375px, $upper-range = 1440px)
+  var1 = $min-font-size
+  var2 = (($max-font-size / ($max-font-size * 0 + 1)) - ($min-font-size / ($min-font-size * 0 + 1)))
+  var3 = (($upper-range / ($upper-range * 0 + 1)) - ($lower-range / ($lower-range * 0 + 1)))
+  font-size "calc(%s + %s * ( (100vw - %s)  / %s))" % (var1 unit(var2, '') $lower-range unit(var3, ''))
+  line-height: 100%;
+  @media screen and (max-width: $lower-range)
+    font-size: $min-font-size;
+  @media screen and (min-width: $upper-range)
+    font-size: $max-font-size;
+
+responsive-unit($min-unit = 12px, $max-unit = 21px, $lower-range = 375px, $upper-range = 1440px)
+  var1 = $min-unit
+  var2 = (($max-unit / ($max-unit * 0 + 1)) - ($min-unit / ($min-unit * 0 + 1)))
+  var3 = (($upper-range / ($upper-range * 0 + 1)) - ($lower-range / ($lower-range * 0 + 1)))
+  --unit: "calc((%s + %s * ( (100vw - %s)  / %s)))" % (var1 unit(var2, '') $lower-range unit(var3, ''))
+  @media screen and (max-width: $lower-range)
+    --unit: $min-unit;
+  @media screen and (min-width: $upper-range)
+    --unit: $max-unit;
+
+responsive-var($min-unit = 12px, $max-unit = 21px, $lower-range = 375px, $upper-range = 1440px)
+  var1 = $min-unit
+  var2 = (($max-unit / ($max-unit * 0 + 1)) - ($min-unit / ($min-unit * 0 + 1)))
+  var3 = (($upper-range / ($upper-range * 0 + 1)) - ($lower-range / ($lower-range * 0 + 1)))
+  "calc((%s + %s * ( (100vw - %s)  / %s)))" % (var1 unit(var2, '') $lower-range unit(var3, ''))
