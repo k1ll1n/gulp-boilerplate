@@ -1,11 +1,11 @@
-require-fonts($font-family, $file-name) {
+require-fonts($file-name) {
   @font-face {
-    font-family: $font-family
+    font-family: $file-name
     src: url("/css/fonts/" + $file-name + ".woff") format('woff'),
             url("/css/fonts/" + $file-name + ".ttf") format('truetype')
-
     font-weight: normal
     font-style: normal
+    font-display: swap;
   }
 }
 
@@ -13,6 +13,7 @@ responsive-font($min-font-size = 12px, $max-font-size = 21px, $lower-range = 375
   var1 = $min-font-size
   var2 = (($max-font-size / ($max-font-size * 0 + 1)) - ($min-font-size / ($min-font-size * 0 + 1)))
   var3 = (($upper-range / ($upper-range * 0 + 1)) - ($lower-range / ($lower-range * 0 + 1)))
+  --lh: "calc((%s + %s * ( (100vw - %s)  / %s)))" % (var1 unit(var2, '') $lower-range unit(var3, ''))
   font-size "calc(%s + %s * ( (100vw - %s)  / %s))" % (var1 unit(var2, '') $lower-range unit(var3, ''))
   line-height: 100%;
   @media screen and (max-width: $lower-range)

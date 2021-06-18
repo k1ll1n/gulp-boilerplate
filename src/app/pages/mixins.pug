@@ -1,0 +1,22 @@
+mixin lazybaseimg(path)
+    img(data-src=path).lazyload
+
+mixin img(filename)
+    picture
+        source(media="(max-width:320px)" srcset=`/img/adaptive/${filename}.320w.jpg`)
+        source(media="(max-width:540px)" srcset=`/img/adaptive/${filename}.540w.jpg`)
+        source(media="(max-width:768px)" srcset=`/img/adaptive/${filename}.768w.jpg`)
+        source(media="(max-width:1024px)" srcset=`/img/adaptive/${filename}.1024w.jpg`)
+        source(media="(max-width:1280px)" srcset=`/img/adaptive/${filename}.1280w.jpg`)
+        source(media="(max-width:1440px)" srcset=`/img/adaptive/${filename}.1440w.jpg`)
+        source(media="(min-width:1980px)" srcset=`/img/adaptive/${filename}.1980w.jpg`)
+        img(src=`/img/adaptive/${filename}.1440w.jpg`)
+
+mixin phone(phone)
+    -
+        var clearedPhone = phone.replace(/[\s_|\W]+/g,"");
+        if (clearedPhone[0] === '8') clearedPhone = clearedPhone.replace('8', '7')
+    a( class="phone" href=`tel:+${clearedPhone}`)&attributes(attributes)= phone
+
+mixin email(email)
+    a(class="email" href=`mailto:+${email}`)&attributes(attributes)= email

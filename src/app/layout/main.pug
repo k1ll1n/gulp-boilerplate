@@ -1,17 +1,26 @@
+include mixins/dns-prefetch
+include mixins/preload-fonts
+
 doctype html
 html(lang="ru")
     head
-        link(rel="preload" href="/css/main.css" as="style")
-        link(rel="preload" href="/js/app.js" as="script")
-        link(rel="preload" href="/css/fonts/TTFirsNeue-Regular.eot" as="font")
-        link(rel="preload" href="/css/fonts/TTFirsNeue-Regular.ttf" as="font")
-        link(rel="preload" href="/css/fonts/TTFirsNeue-Regular.woff" as="font")
-        link(rel="preload" href="/css/fonts/TTFirsNeue-Regular.woff2" as="font")
+        +preload-fonts(['TTFirsNeue-Regular'])
 
         meta(charset="utf-8")
-        link(rel="shortcut icon" href="/favicon.ico")
-        link(rel="stylesheet" href='css/main.css')
+
+        include mixins/main_screen_style
+
+        +dns-prefetch(['domain-name.com'])
+
+        if env.GULP_ENV === 'production'
+            link(rel="shortcut icon" href="/img/favicons/favicon.ico")
+            link(rel="apple-touch-icon", sizes="180x180", href="/img/favicons/apple-touch-icon.png")
+            link(rel="icon", type="image/png", sizes="32x32", href="/img/favicons/favicon-32x32.png")
+            link(rel="icon", type="image/png", sizes="16x16", href="/img/favicons/favicon-16x16.png")
+            link(rel="icon", type="image/png", sizes="192x192", href="/img/favicons/android-chrome-192x192.png")
+            link(rel="icon", type="image/png", sizes="384x384", href="/img/favicons/android-chrome-384x384.png")
         title Site
+        meta(name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, shrink-to-fit=no")
 
     body
         div#page
@@ -32,4 +41,4 @@ html(lang="ru")
                     block footer
                         include elements/footer
 
-        script(src='js/app.js')
+        include mixins/scripts_and_styles

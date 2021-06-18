@@ -1,0 +1,5 @@
+if env.GULP_ENV === 'production'
+    style
+        include ../../../../build/css/main_screen.css
+else
+    link(rel="stylesheet" href='/css/main_screen.css')

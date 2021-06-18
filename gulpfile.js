@@ -8,6 +8,9 @@ function buildHtml() {
     return src(html.input)
         .pipe(plugins.gulpPug({
             pretty: true,
+            locals: {
+                env: process.env
+            }
         }))
         .pipe(dest(html.output))
         .pipe(reload({stream: true}))
@@ -35,19 +38,59 @@ function buildStyles() {
         .pipe(reload({stream: true}))
 }
 
-function buildJs() {
-    const js = paths.js
-    return src(js.input)
-        .pipe(plugins.rollup({
-            input: 'src/app/js/app.js',
-            output: {
-                format: 'iife',
-            },
-            plugins: [
-                plugins.terser.terser()
-            ]
-        }))
+function collectVendorCss() {
+    return src(paths.styles.vendor.input)
+        .pipe(dest(paths.styles.vendor.output))
+        .pipe(plugins.gulpPostCss([
+            plugins.cssMinify({
+                discardComments: {
+                    removeAll: true
+                }
+            })
+        ]))
+        .pipe(dest(paths.styles.vendor.output))
+        .pipe(reload({stream: true}))
+}
+
+let cache;
+task('buildJs', () => {
+    const options = {
+        input: 'src/app/js/app.js',
+        plugins: [
+            plugins.terser.terser(),
+            plugins.commonjs({
+                include: [ "node_modules/**" ],
+                ignoreGlobal: false,
+                sourceMap: false
+            }),
+
+            plugins.nodeResolve({
+                jsnext: true,
+                main: false,
+                browser: true
+            }),
+            plugins.css()
+        ],
+        output: {
+            file: 'build/js/app.js',
+            format: 'iife',
+            name: 'app',
+            sourcemap: false
+        }};
+
+    return plugins.rollupStream(options)
+        .on('bundle', (bundle) => {
+            cache = bundle;
+        })
+        .pipe(plugins.source('app.js'))
+        .pipe(plugins.buffer())
         .pipe(dest('build/js/'))
+        .pipe(reload({stream: true}))
+});
+
+function collectVendorJs() {
+    return src(paths.js.vendor.input)
+        .pipe(dest(paths.js.vendor.output))
         .pipe(reload({stream: true}))
 }
 
@@ -73,22 +116,35 @@ function collectImages() {
         .pipe(reload({stream: true}))
 }
 
+function croppingImages() {
+    const variants = (file, done) => {
+        const sizes = [1980, 1440, 1280, 1024, 768, 540, 320]
+        const files = []
+        sizes.forEach(size => {
+            const tmpFile = file.clone()
+            tmpFile.scale = {maxWidth: size, format: 'jpg'}
+            files.push(tmpFile)
+        })
+
+        done(null, files)
+    }
+    return src('src/app/img/**/*.{jpeg,jpg}')
+        .pipe(plugins.flatMap.default(variants))
+        .pipe(plugins.scaleImages())
+        .pipe(dest('build/img/adaptive/'))
+        .pipe(reload({stream: true}))
+}
+
 function collectFonts() {
     return src(paths.fonts.input)
         .pipe(dest(paths.fonts.output))
         .pipe(reload({stream: true}))
 }
 
-function collectVendorJs() {
-    return src(paths.js.vendor.input)
-        .pipe(dest(paths.js.vendor.output))
-        .pipe(reload({stream: true}))
-}
-
 function watchFiles() {
-    watch([paths.html.input, 'src/app/layout/main.pug'], buildHtml)
-    watch(['src/app/css/**/*.styl'], buildStyles)
-    watch([paths.js.input, 'src/app/js/vendor/*.js'], buildJs)
+    watch(paths.html.watch, buildHtml)
+    watch(paths.styles.watch, buildStyles)
+    watch(paths.js.watch, series('buildJs'))
     watch([paths.images.input], collectImages)
     watch(paths.fonts.input, collectFonts)
 }
@@ -98,15 +154,16 @@ task('webserver', done => {
     done()
 })
 
-const devBuild = series(buildStyles, /*mergeVendorStyles,*/ buildJs, collectVendorJs, collectImages, collectFonts, buildHtml)
-const prodBuild = series(buildStyles, /*mergeVendorStyles,*/ buildJs, collectVendorJs, collectImages, collectFonts, /*collectOthers,*/ buildHtml)
+const devBuild = series(buildStyles, collectVendorCss, 'buildJs', collectVendorJs, collectImages, croppingImages, collectFonts, buildHtml)
+const prodBuild = series(buildStyles, collectVendorCss, 'buildJs', collectVendorJs, collectImages, croppingImages, collectFonts, /*collectOthers,*/ buildHtml)
 
 const mode = env === 'development' ? devBuild : prodBuild
 const def = env === 'development' ? series(mode, 'webserver', watchFiles) : mode
 
 exports.html = buildHtml
 exports.css = buildStyles
-exports.js = buildJs
+exports.vendorCss = collectVendorCss
+exports.croppingImages = croppingImages
 exports.vendorJs = collectVendorJs
 exports.images = collectImages
 exports.fonts = collectFonts

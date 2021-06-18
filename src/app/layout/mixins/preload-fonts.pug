@@ -1,0 +1,4 @@
+mixin preload-fonts(fonts)
+    each val in fonts
+        link(rel = "preload" href = `/css/fonts/${val}.ttf` as = "font" crossorigin)
+        link(rel = "preload" href = `/css/fonts/${val}.woff` as = "font" crossorigin)

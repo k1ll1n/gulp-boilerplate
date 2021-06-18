@@ -1,0 +1,11 @@
+if env.GULP_ENV === 'production'
+    style
+        include ../../../../build/css/main.css
+else
+    link(rel="stylesheet" href='/css/main.css')
+
+if env.GULP_ENV === 'production'
+    script
+        include ../../../../build/js/app.js
+else
+    script(src='/js/app.js')

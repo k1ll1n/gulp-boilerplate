@@ -1,4 +1,9 @@
 extends ../layout/main
 
+include mixins
+
 block content
-    h1 hello!
+    div.slider
+        - var n = 1
+        while n++ < 10
+            img(src=`/img/l${n}.jpg`)
